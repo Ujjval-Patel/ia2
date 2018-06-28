@@ -1,0 +1,23 @@
+1)
+
+Dado 3 jarras de capacidades 8, 5 e 3 litros. Nenhuma delas tem qualquer
+marcação de medidas. O jarro de 8 litros está cheio de água, os demais estão vazios. 
+Usando essas 3 jarras, como separar 4 litros em um deles?
+
+2)
+
+O problema das oito damas é o problema matemático de dispor oito damas em
+um tabuleiro de xadrez de dimensão 8x8, de forma que nenhuma delas seja atacada
+por outra. Para tanto, é necessário que duas damas quaisquer não estejam numa
+mesma linha, coluna, ou diagonal. Este é um caso específico do Problema das n
+damas, no qual temos n damas e um tabuleiro com n×n casas(para qualquer n ≥ 4).
+
+3)
+
+Três canibais e três missionários estão viajando juntos e chegam à margem
+de um rio. Eles desejam atravessar para a outra margem para, desta forma,
+continuar a viagem. O único meio de transporte disponível é um barco que
+comporta no máximo duas pessoas. Há uma outra dificuldade: em nenhum momento o
+número de canibais pode ser superior ao número de missionários pois desta forma
+os missionários estariam em grande perigo de vida. Como administrar a
+travessia?
