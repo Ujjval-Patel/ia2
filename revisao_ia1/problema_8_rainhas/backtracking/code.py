@@ -9,7 +9,7 @@ from: https://www.geeksforgeeks.org/backtracking-set-3-n-queen-problem/
 """
 
 global N
-N = 4
+N = 10
 
 
 def print_solution(board):
