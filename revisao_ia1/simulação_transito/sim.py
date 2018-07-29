@@ -3,9 +3,14 @@
 """
 Created by lativ on 22/07/18 at 13:55
 """
+import os
+import time
+import random
+
 
 def tem_espaco(trecho):
     return trecho.count(0) > 0
+
 
 def atualiza_trecho(idt, cid, sinals, slots):
     # TODO: considerar sinals
@@ -36,7 +41,7 @@ def atualiza_trecho(idt, cid, sinals, slots):
         cid[idt] = [0] + cid[idt][:-1]  # Remove o último bit
 
     if pode_atualizar and not pode_liberar:
-        # Move bits ativos, se poslotsível
+        # Move bits ativos, se possível
         for i in range(len(cid[idt]) - 1, 0, -1):
             if cid[idt][i] == 0 and cid[idt][i - 1] == 1:
                 cid[idt][i], cid[idt][i - 1] = 1, 0
@@ -46,9 +51,11 @@ def atualiza_trecho(idt, cid, sinals, slots):
         slots[idt][0] = 0
         cid[idt][0] = 1
 
+
 def return_reverse(trecho):
     trecho.reverse()
     return trecho
+
 
 def mostra_cidade(cidade, slots):
     # TODO: use um loop, torne menos estático e mais escalável
@@ -62,37 +69,49 @@ def mostra_cidade(cidade, slots):
     print()
 
 
-total_trechos = 4
-total_sem = 4
-tam_trecho = 5
+def criar_cidade(total_trechos, tamanho_trecho, total_semaforos):
 
-"""
-S 0 0 0 0 0 S
-0           0
-0           0
-0           0
-0           0
-0           0
-S 0 0 0 0 0 S
+    """
+    S 0 0 0 0 0 S
+    0           0
+    0           0
+    0           0
+    0           0
+    0           0
+    S 0 0 0 0 0 S
 
-Em sentido horário, a partir de cima, temos: S0 T0 S1 T1 S2 T2 S3 T3.
+    Em sentido horário, a partir de cima, temos: S0 T0 S1 T1 S2 T2 S3 T3.
 
-Cada trecho tem tamanho 5 com semáforos atrás e à frente. São 4 trechos, logo 4 semáforos aqui.
-"""
+    Cada trecho tem tamanho 5 com semáforos atrás e à frente. São 4 trechos, logo 4 semáforos aqui.
+    """
 
-# TODO: usar modulo bitvector
-cidade = [[1 for _ in range(tam_trecho)] for _ in range(total_trechos)]
-sinal_semaforos = [1 for _ in range(total_sem)]  # Todos ativos (verdes)
-slot_semaforos = [[0, 0] for _ in range(total_sem)]  # Todos vazios
+    # TODO: usar modulo bitvector
+    #cidade = [[1 if b % 2 == 0 else 0 for b in range(tam_trecho)] for _ in range(total_trechos)]
+    cidade = [[1 if random.randint(0, 1) == 0 else 0 for _ in range(tamanho_trecho)] for _ in range(total_trechos)]
+    sinal_semaforos = [1 for _ in range(total_semaforos)]  # Todos ativos (verdes)
+    slot_semaforos = [[0, 0] for _ in range(total_semaforos)]  # Todos vazios
 
-mostra_cidade(cidade, slot_semaforos)
+    return cidade, sinal_semaforos, slot_semaforos
 
-for i in range(11):
-    for id_trecho in range(total_trechos):
-        atualiza_trecho(id_trecho, cidade, sinal_semaforos, slot_semaforos)
-    print('Iteração ', i+1)
-    for s in slot_semaforos:
-        s[1] = 0
-    mostra_cidade(cidade, slot_semaforos)
+
+def rodar_simulacao(cidade, sinais, slots, n_trechos):
+   while True:
+        for id_trecho in range(n_trechos):
+            atualiza_trecho(id_trecho, cidade, sinais, slots)
+        for s in slots:
+            s[1] = 0
+        os.system('clear')
+        mostra_cidade(cidade, slots)
+        time.sleep(5)
+
+
+def main():
+    n_trechos = 4
+    cidade, sinais, slots = criar_cidade(4, 5, n_trechos)
+    rodar_simulacao(cidade, sinais, slots, n_trechos)
 
     # Registra congestionamentos
+
+
+if __name__ == '__main__':
+    main()
