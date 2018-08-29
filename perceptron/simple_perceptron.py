@@ -8,6 +8,7 @@ Simulating the AND logical operator.
 
 import numpy as np
 
+
 def activation(net):
     if net > 0:
         return 1
@@ -113,8 +114,10 @@ def get_triangle_data():
 
     return X, Y
 
+
 if __name__ == '__main__':
 
-    X, Y = get_and_operator_data()
+    # X, Y = get_and_operator_data()
+    X, Y = get_triangle_data()
 
     trained_weights = train_perceptron(X, Y)
