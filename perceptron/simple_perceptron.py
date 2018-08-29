@@ -115,9 +115,27 @@ def get_triangle_data():
     return X, Y
 
 
+def predict(test_in, weights):
+
+    y_pred = activation(np.dot(test_in, weights))
+
+    return y_pred
+
+
 if __name__ == '__main__':
 
     # X, Y = get_and_operator_data()
     X, Y = get_triangle_data()
 
+    ones1 = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    ones2 = [[1, 1, 0], [1, 0, 1], [0, 1, 1]]
+    ones3 = [[1, 1, 1]]
+
+    # This problem has the disadvantage of low valid cases
+    # It is needed to re-think the input matrix X to allow more valid cases.
+    test_in = np.array([ones2[0], ones3[0], ones1[0]]).ravel()
+    test_out = 0
+
     trained_weights = train_perceptron(X, Y)
+    y_pred = predict(test_in, trained_weights)
+    print("\nInput: {}\nPredicted: {}\nActual: {}\n".format(test_in, y_pred, test_out))
