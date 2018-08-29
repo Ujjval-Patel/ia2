@@ -8,7 +8,6 @@ Simulating the AND logical operator.
 
 import numpy as np
 
-
 def activation(net):
     if net > 0:
         return 1
@@ -69,6 +68,51 @@ def get_and_operator_data():
 
    return X, Y
 
+
+def get_triangle_data():
+
+    """          X       Y
+    001
+    011  -> 001 011 111  1
+    111
+
+    (1, 3) (2, 2) (3, 1)
+
+    100
+    110  -> 100 110 111  1
+    111
+
+    (1, 1) (2, 1) (3, 1)
+
+    111
+    110  -> 111 110 100  1
+    100
+
+    (3, 1) (2, 1) (1, 1)
+
+    111
+    011  -> 111 011 001  1
+    001
+
+    """
+
+    ones1 = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    ones2 = [[1, 1, 0], [1, 0, 1], [0, 1, 1]]
+    ones3 = [[1, 1, 1]]
+
+    X = np.array([np.array([ones1[0], ones2[0], ones3[0]]).ravel(),  # y = 1
+                  np.array([ones1[2], ones2[2], ones3[0]]).ravel(),  # y = 1
+                  np.array([ones1[0], ones2[1], ones3[0]]).ravel(),  # y = 0
+                  np.array([ones1[0], ones2[2], ones3[0]]).ravel(),  # y = 0
+                  np.array([ones3[0], ones2[0], ones1[0]]).ravel(),  # y = 1
+                  np.array([ones3[0], ones2[2], ones1[2]]).ravel(),  # y = 1
+                  np.array([ones3[0], ones2[1], ones1[1]]).ravel(),  # y = 0
+                  np.array([ones3[0], ones2[1], ones1[2]]).ravel(),  # y = 0
+                  ], np.uint8)
+
+    Y = np.array([1, 1, 0, 0, 1, 1, 0, 0])
+
+    return X, Y
 
 if __name__ == '__main__':
 
