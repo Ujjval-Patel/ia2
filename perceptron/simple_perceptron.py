@@ -17,7 +17,7 @@ def activation(net):
 
 def train_perceptron(X, Y, learning_rate=0.5):
 
-    W = np.array([0, 0, 0])
+    W = np.zeros_like(X[0])  # Get initial weights
 
     # INFO
     cicle = 0
@@ -43,7 +43,6 @@ def train_perceptron(X, Y, learning_rate=0.5):
             if y_in != y_out:
                 weights_updated = []
                 for (w, x) in zip(W, x_in):
-
                     wi = w + learning_rate * (y_out - y_in) * x
                     weights_updated.append(wi)
 
