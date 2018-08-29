@@ -15,49 +15,63 @@ def activation(net):
     else:
         return 0
 
-#           bias x1 x2
-X = np.array([[1, 0, 0],
-              [1, 0, 1],
-              [1, 1, 0],
-              [1, 1, 1]], np.uint8)
 
-Y = np.array([0, 0, 0, 1])
+def train_perceptron(X, Y, learning_rate=0.5):
 
-W = np.array([0, 0, 0])
+    W = np.array([0, 0, 0])
 
-learning_rate = 0.5
+    # INFO
+    cicle = 0
 
-# INFO
-cicle = 0
+    print("Initial weights: {}".format(W))
 
-print("Initial weights: {}".format(W))
+    same_weights = False
 
-same_weights = False
+    while not same_weights:
+        cicle += 1
+        print("Cicle {}".format(cicle))
 
-while not same_weights:
-    cicle += 1
-    print("Cicle {}".format(cicle))
+        n_input = 0
 
-    n_input = 0
+        same_weights = True
 
-    same_weights = True
+        for (x_in, y_out) in zip(X, Y):
+            n_input += 1
+            print('\tInput {}'.format(n_input))
 
-    for (x_in, y_out) in zip(X, Y):
-        n_input += 1
-        print('Input {}'.format(n_input))
+            y_in = activation(np.dot(x_in, W))
 
-        y_in = activation(np.dot(x_in, W))
+            if y_in != y_out:
+                weights_updated = []
+                for (w, x) in zip(W, x_in):
+
+                    wi = w + learning_rate * (y_out - y_in) * x
+                    weights_updated.append(wi)
+
+                W = np.asarray(weights_updated)
+
+                same_weights = False
+
+            print('\t\tWeights: {}'.format(W))
+
+    return W
 
 
-        if y_in != y_out:
-            weights_updated = []
-            for (w, x) in zip(W, x_in):
+def get_and_operator_data():
 
-                wi = w + learning_rate * (y_out - y_in) * x
-                weights_updated.append(wi)
+   #           bias x1 x2
+   X = np.array([[1, 0, 0],
+                 [1, 0, 1],
+                 [1, 1, 0],
+                 [1, 1, 1]], np.uint8)
 
-            W = np.asarray(weights_updated)
+   Y = np.array([0, 0, 0, 1])
 
-            same_weights = False
+   return X, Y
 
-        print('Weights: {}'.format(W))
+
+if __name__ == '__main__':
+
+    X, Y = get_and_operator_data()
+
+    trained_weights = train_perceptron(X, Y)
