@@ -13,6 +13,7 @@ In this case we must expand the dimensions, like (6, 6) and insert a matrix (3, 
 """
 
 import numpy as np
+import time
 
 
 def activation(net):
@@ -113,9 +114,13 @@ def get_triangle_data():
                   np.array([ones3[0], ones2[0], ones1[0]]).ravel(),  # y = 1
                   np.array([ones3[0], ones2[1], ones1[1]]).ravel(),  # y = 0
                   np.array([ones3[0], ones2[1], ones1[2]]).ravel(),  # y = 0
+                  np.array([ones3[0], ones2[2], ones1[1]]).ravel(),  # y = 0
+                  np.array([ones2[0], ones3[0], ones1[0]]).ravel(),  # y = 0
+                  np.array([ones2[1], ones3[0], ones1[0]]).ravel(),  # y = 0
+                  np.array([ones2[2], ones3[0], ones1[0]]).ravel(),  # y = 0
                   ], np.uint8)
 
-    bias = np.ones((7,1), np.uint8)
+    bias = np.ones((X.shape[0], 1), np.uint8)
 
     X = np.concatenate([bias, X], axis=1)
 
@@ -150,8 +155,12 @@ if __name__ == '__main__':
 
     trained_weights = train_perceptron(X, Y)
 
-    y_pred = predict(test_in_0, trained_weights)
-    print("\nInput: {}\nPredicted: {}\nActual: {}\n".format(test_in_0, y_pred, test_out_0))
+    timestr = time.localtime()
+    timestr = '_'.join([str (t) for t in [timestr.tm_mday, timestr.tm_mon, timestr.tm_hour, timestr.tm_min]])
+    np.save('weights_' + timestr, trained_weights)
 
-    y_pred_1= predict(test_in_1, trained_weights)
-    print("\nInput: {}\nPredicted: {}\nActual: {}\n".format(test_in_1, y_pred, test_out_1))
+    y_pred_0 = predict(test_in_0, trained_weights)
+    print("\nInput: {}\nPredicted: {}\nActual: {}\n".format(test_in_0, y_pred_0, test_out_0))
+
+    y_pred_1 = predict(test_in_1, trained_weights)
+    print("\nInput: {}\nPredicted: {}\nActual: {}\n".format(test_in_1, y_pred_1, test_out_1))
