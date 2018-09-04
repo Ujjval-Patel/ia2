@@ -14,6 +14,7 @@ In this case we must expand the dimensions, like (6, 6) and insert a matrix (3, 
 
 import numpy as np
 import time
+import random
 
 
 def activation(net):
@@ -76,57 +77,95 @@ def get_and_operator_data():
    return X, Y
 
 
+def generate_triangles(mat_size, t_type):
+
+    valid_triangle = np.array([[1, 0, 0], [1, 1, 0], [1, 1, 1]])
+    invalid_triangle = np.array([[1, 1, 1], [0, 1, 1], [0, 0, 1]])
+    triangle_size = 3
+
+    triangles = []
+    triangle = valid_triangle.copy()
+    t_class = 1
+
+    if t_type == 'invalid':
+        triangle = invalid_triangle.copy()
+        t_class = 0
+
+    # Because we use a 5x5 matrix,
+    # we only can insert triangles at (0, 0) to (idx_limit, idx_limit)
+    idx_limit = mat_size - triangle_size
+    idxs = []
+
+    # TODO: is there a better way?
+    for i in range(idx_limit + 1):
+        for j in range(idx_limit + 1):
+            idxs.append((i, j))
+
+    # random.shuffle(idxs)
+
+    # number of triangles is the total of possible coordinates
+    n_triangles = idx_limit + 1
+    n_triangles = n_triangles * n_triangles
+
+    for _ in range(n_triangles):
+        i, j = idxs.pop()
+        mat = np.zeros((mat_size, mat_size), np.uint8)
+        mat[i:i+3, j:j+3] = triangle.copy()
+        mat = np.append(mat.ravel(), t_class)
+        # triangles.append((mat.ravel(), t_class))
+        triangles.append(mat)
+
+    return triangles
+
+
 def get_triangle_data():
+    """
+    A valid triangle here has the form:
+        1 0 0
+        1 1 0   that as a column vector is 1 0 0 1 1 0 1 1 1
+        1 1 1
 
-    """          X       Y
-    001
-    011  -> 001 011 111  1
-    111
+    A invalid triangle here has the form:
+        1 1 1
+        0 1 1   that as a column vector is 1 1 1 0 1 1 0 0 1
+        0 0 1
 
-    (1, 3) (2, 2) (3, 1)
-
-    100
-    110  -> 100 110 111  1
-    111
-
-    (1, 1) (2, 1) (3, 1)
-
-    111
-    110  -> 111 110 100  1
-    100
-
-    (3, 1) (2, 1) (1, 1)
-
-    111
-    011  -> 111 011 001  1
-    001
 
     """
 
-    ones1 = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-    ones2 = [[1, 1, 0], [1, 0, 1], [0, 1, 1]]
-    ones3 = [[1, 1, 1]]
+    # Return triangles as vectors with associated class (0 or 1) at the end.
+    valid_triangle_list = generate_triangles(mat_size=5, t_type='valid')
+    invalid_triangle_list = generate_triangles(mat_size=5, t_type='invalid')
 
-    X = np.array([np.array([ones1[0], ones2[0], ones3[0]]).ravel(),  # y = 1
-                  np.array([ones1[2], ones2[2], ones3[0]]).ravel(),  # y = 1
-                  np.array([ones1[0], ones2[1], ones3[0]]).ravel(),  # y = 0
-                  np.array([ones1[0], ones2[2], ones3[0]]).ravel(),  # y = 0
-                  np.array([ones3[0], ones2[0], ones1[0]]).ravel(),  # y = 1
-                  np.array([ones3[0], ones2[1], ones1[1]]).ravel(),  # y = 0
-                  np.array([ones3[0], ones2[1], ones1[2]]).ravel(),  # y = 0
-                  np.array([ones3[0], ones2[2], ones1[1]]).ravel(),  # y = 0
-                  np.array([ones2[0], ones3[0], ones1[0]]).ravel(),  # y = 0
-                  np.array([ones2[1], ones3[0], ones1[0]]).ravel(),  # y = 0
-                  np.array([ones2[2], ones3[0], ones1[0]]).ravel(),  # y = 0
-                  ], np.uint8)
+    # Shuffle each triangle position
+    random.shuffle(valid_triangle_list)
+    random.shuffle(invalid_triangle_list)
 
-    bias = np.ones((X.shape[0], 1), np.uint8)
+    # Divide the list in half to train and half to test
+    training_valid_triangles = valid_triangle_list[:len(valid_triangle_list)//2]
+    test_valid_triangles = valid_triangle_list[len(valid_triangle_list)//2:]
 
-    X = np.concatenate([bias, X], axis=1)
+    # Same for invalid triangles
+    training_invalid_triangles = invalid_triangle_list[:len(invalid_triangle_list)//2]
+    test_invalid_triangles = invalid_triangle_list[len(invalid_triangle_list)//2:]
 
-    Y = np.array([1, 1, 0, 0, 1, 1, 0, 0])
+    # Join lists of valid and invalid triangles for training. After, shuffle again.
+    # X_train = np.concatenate([training_valid_triangles, training_invalid_triangles])
+    X_train = training_valid_triangles + training_invalid_triangles
+    random.shuffle(X_train)
 
-    return X, Y
+    # Same for testing
+    # X_test = np.concatenate([test_valid_triangles, test_invalid_triangles])
+    X_test = test_valid_triangles + test_invalid_triangles
+    random.shuffle(X_test)
+
+    train_bias = np.ones((len(X_train), 1), np.uint8)
+    test_bias = np.ones((len(X_test), 1), np.uint8)
+
+    X_train = np.concatenate([train_bias, X_train], axis=1)
+    X_test = np.concatenate([test_bias, X_test], axis=1)
+
+    return X_train, X_test
 
 
 def predict(test_in, weights):
@@ -139,28 +178,11 @@ def predict(test_in, weights):
 if __name__ == '__main__':
 
     # X, Y = get_and_operator_data()
-    X, Y = get_triangle_data()
+    X_train, X_test = get_triangle_data()  # Both are numpy matrices
 
-    ones1 = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-    ones2 = [[1, 1, 0], [1, 0, 1], [0, 1, 1]]
-    ones3 = [[1, 1, 1]]
-
-    # This problem has the disadvantage of low valid cases
-    # It is needed to re-think the input matrix X to allow more valid cases.
-    test_in_0 = np.concatenate([[1], np.array([ones2[0], ones3[0], ones1[0]]).ravel()])
-    test_out_0 = 0
-
-    test_in_1  = np.concatenate([[1], np.array([ones3[0], ones2[2], ones1[2]]).ravel()])  # y = 1
-    test_out_1 = 1
-
-    trained_weights = train_perceptron(X, Y)
+    Y_train = [t[-1] for t in X_train]
+    trained_weights = train_perceptron(X_train, Y_train)
 
     timestr = time.localtime()
     timestr = '_'.join([str (t) for t in [timestr.tm_mday, timestr.tm_mon, timestr.tm_hour, timestr.tm_min]])
     np.save('weights_' + timestr, trained_weights)
-
-    y_pred_0 = predict(test_in_0, trained_weights)
-    print("\nInput: {}\nPredicted: {}\nActual: {}\n".format(test_in_0, y_pred_0, test_out_0))
-
-    y_pred_1 = predict(test_in_1, trained_weights)
-    print("\nInput: {}\nPredicted: {}\nActual: {}\n".format(test_in_1, y_pred_1, test_out_1))
