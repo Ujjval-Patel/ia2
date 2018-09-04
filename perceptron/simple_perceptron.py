@@ -185,7 +185,7 @@ def test_perceptron(X, Y, weights):
     correct_classifications = 0
 
     for (x_in, y_out) in zip(X, Y):
-        y_pred = activation(np.dot(x_in, y_out))
+        y_pred = activation(np.dot(x_in, weights))
         if y_pred == y_out:
             correct_classifications += 1
 
@@ -203,3 +203,5 @@ if __name__ == '__main__':
     np.save('weights_' + timestr, trained_weights)
 
     acc = test_perceptron(X_test, Y_test, trained_weights)
+
+    print('accuracy: ', acc)
