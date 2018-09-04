@@ -175,6 +175,17 @@ def predict(test_in, weights):
     return y_pred
 
 
+def test_perceptron(X, Y, weights):
+
+    correct_classifications = 0
+
+    for (x_in, y_out) in zip(X, Y):
+        y_pred = activation(np.dot(x_in, y_out))
+        if y_pred == y_out:
+            correct_classifications += 1
+
+    return correct_classifications/len(X)
+
 if __name__ == '__main__':
 
     # X, Y = get_and_operator_data()
@@ -186,3 +197,6 @@ if __name__ == '__main__':
     timestr = time.localtime()
     timestr = '_'.join([str (t) for t in [timestr.tm_mday, timestr.tm_mon, timestr.tm_hour, timestr.tm_min]])
     np.save('weights_' + timestr, trained_weights)
+
+    Y_test = [t[-1] for t in X_test]
+    acc = test_perceptron(X_test, Y_test, trained_weights)
