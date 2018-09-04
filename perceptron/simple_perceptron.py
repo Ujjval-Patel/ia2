@@ -163,9 +163,14 @@ def get_triangle_data():
     test_bias = np.ones((len(X_test), 1), np.uint8)
 
     X_train = np.concatenate([train_bias, X_train], axis=1)
-    X_test = np.concatenate([test_bias, X_test], axis=1)
+    Y_train = [t[-1] for t in X_train]
+    X_train = np.delete(X_train, X_train.shape[1] - 1, axis=1)
 
-    return X_train, X_test
+    X_test = np.concatenate([test_bias, X_test], axis=1)
+    Y_test = [t[-1] for t in X_test]
+    X_test = np.delete(X_test, X_test.shape[1] - 1, axis=1)
+
+    return X_train, Y_train, X_test, Y_test
 
 
 def predict(test_in, weights):
@@ -189,14 +194,12 @@ def test_perceptron(X, Y, weights):
 if __name__ == '__main__':
 
     # X, Y = get_and_operator_data()
-    X_train, X_test = get_triangle_data()  # Both are numpy matrices
+    X_train, Y_train, X_test, Y_test = get_triangle_data()  # Both are numpy matrices
 
-    Y_train = [t[-1] for t in X_train]
     trained_weights = train_perceptron(X_train, Y_train)
 
     timestr = time.localtime()
     timestr = '_'.join([str (t) for t in [timestr.tm_mday, timestr.tm_mon, timestr.tm_hour, timestr.tm_min]])
     np.save('weights_' + timestr, trained_weights)
 
-    Y_test = [t[-1] for t in X_test]
     acc = test_perceptron(X_test, Y_test, trained_weights)
