@@ -24,20 +24,22 @@ def activation(net):
         return 0
 
 
-def train_perceptron(X, Y, learning_rate=0.5):
+def train_perceptron(X, Y, learning_rate=0.5, verbose=True):
 
     W = np.zeros_like(X[0])  # Get initial weights
 
     # INFO
     cicle = 0
 
-    print("Initial weights: {}".format(W))
+    if verbose:
+        print("Initial weights: {}".format(W))
 
     same_weights = False
 
     while not same_weights:
         cicle += 1
-        print("Cicle {}".format(cicle))
+        if verbose:
+            print("Cicle {}".format(cicle))
 
         n_input = 0
 
@@ -45,7 +47,8 @@ def train_perceptron(X, Y, learning_rate=0.5):
 
         for (x_in, y_out) in zip(X, Y):
             n_input += 1
-            print('\tInput {}'.format(n_input))
+            if verbose:
+                print('\tInput {}'.format(n_input))
 
             y_in = activation(np.dot(x_in, W))
 
@@ -59,9 +62,10 @@ def train_perceptron(X, Y, learning_rate=0.5):
 
                 same_weights = False
 
-            print('\t\tWeights: {}'.format(W))
+            if verbose:
+                print('\t\tWeights: {}'.format(W))
 
-    return W
+    return cicle, W
 
 
 def get_and_operator_data():
@@ -194,14 +198,38 @@ def test_perceptron(X, Y, weights):
 if __name__ == '__main__':
 
     # X, Y = get_and_operator_data()
-    X_train, Y_train, X_test, Y_test = get_triangle_data()  # Both are numpy matrices
+    tries = 0
+    cicles_acc = []
 
-    trained_weights = train_perceptron(X_train, Y_train)
+    while True:
+        tries += 1
+        X_train, Y_train, X_test, Y_test = get_triangle_data()  # Both are numpy matrices
 
-    timestr = time.localtime()
-    timestr = '_'.join([str (t) for t in [timestr.tm_mday, timestr.tm_mon, timestr.tm_hour, timestr.tm_min]])
-    np.save('weights_' + timestr, trained_weights)
+        runs, trained_weights = train_perceptron(X_train, Y_train, verbose=False)
 
-    acc = test_perceptron(X_test, Y_test, trained_weights)
+        timestr = time.localtime()
+        timestr = '_'.join([str (t) for t in [timestr.tm_mday, timestr.tm_mon, timestr.tm_hour, timestr.tm_min]])
+        np.save('weights_' + timestr, trained_weights)
 
-    print('accuracy: ', acc)
+        acc = test_perceptron(X_test, Y_test, trained_weights)
+
+        cicles_acc.append((tries, runs, acc))
+
+        if tries == 100:
+            break
+
+    # print(cicles_acc)
+    runs = []
+    accs = []
+
+    for t in cicles_acc:
+        runs.append(t[1])
+        accs.append(t[2])
+
+    print(runs)
+    print(accs)
+
+    import matplotlib.pyplot as plt
+
+    plt.plot(runs, accs, 'ro')
+    plt.show()
